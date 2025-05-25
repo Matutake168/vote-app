@@ -1,0 +1,38 @@
+import streamlit as st
+
+# 投票先一覧
+dantai = list(range(1, 11))
+
+# セッション状態の初期化（初回のみ）
+if "vote_counts" not in st.session_state:
+    st.session_state.vote_counts = {num: 0 for num in dantai}
+if "touched_ids" not in st.session_state:
+    st.session_state.touched_ids = []
+
+st.title("🎉 学園祭 投票システム 🎉")
+
+# 学年選択
+gakunen = st.selectbox("あなたの学年は？", ["M7", "M8", "C9", "C10", "C11", "C12"])
+
+# 学籍番号入力
+gakuban = st.text_input("学籍番号を入力してください（例：a2024013）").lower().strip()
+
+# 投票先選択
+saki = st.selectbox("投票したい団体を選んでください：", dantai)
+
+# 投票ボタン
+if st.button("投票！"):
+    if len(gakuban) == 8 and gakuban[0] in ['a', 'b'] and gakuban[1:].isdigit():
+        if gakuban not in st.session_state.touched_ids:
+            st.session_state.touched_ids.append(gakuban)
+            st.session_state.vote_counts[saki] += 1
+            st.success("✅ 投票が完了しました！ありがとう！")
+        else:
+            st.error("⚠ この学籍番号はすでに投票済みです。")
+    else:
+        st.error("⚠ 正しい形式の学籍番号を入力してください（例：a2024013）")
+
+# 現在の票数表示
+st.subheader("📊 現在の投票状況")
+for num in dantai:
+    st.write(f"団体{num}: {st.session_state.vote_counts[num]}票")
